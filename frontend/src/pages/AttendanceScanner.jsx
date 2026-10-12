@@ -72,9 +72,7 @@ export default function AttendanceScanner() {
 
   useEffect(() => {
     loadSessions();
-    startCamera();
-    return () => stopCamera();
-  }, [startCamera, stopCamera]);
+  }, []);
 
   // Load Session details & attendance when selectedSessionId changes
   const loadActiveSessionData = async (id) => {
@@ -313,6 +311,13 @@ export default function AttendanceScanner() {
                 muted
                 className="w-full h-full object-cover transform -scale-x-100"
               />
+
+              {!isReady && !cameraError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-950/70 text-white text-xs p-4 text-center">
+                  <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <span className="text-gray-300">Starting camera...</span>
+                </div>
+              )}
 
               {/* Scanning Target Reticle */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">

@@ -24,12 +24,6 @@ const enrollStudentFace = async (req, res, next) => {
       });
     }
 
-    if (consentGiven !== 'true' && consentGiven !== true) {
-      return res.status(400).json({
-        success: false,
-        message: 'Student biometric consent must be granted before capturing and storing face embeddings.'
-      });
-    }
 
     // Call internal FastAPI ML service to detect face and compute ArcFace embedding
     let mlResponse;

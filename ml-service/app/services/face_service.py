@@ -29,10 +29,23 @@ class FaceService:
     def initialize(self):
         if self.is_ready:
             return
-        # Initialize InsightFace with CPUExecutionProvider
+        # Initialize InsightFace with CPUExecutionProvider for landmarks & ArcFace
         self.app = FaceAnalysis(name=self.model_name, providers=["CPUExecutionProvider"])
         self.app.prepare(ctx_id=-1, det_size=self.det_size)
-        self.detector = InsightFaceDetector(self.app)
+        
+        # Initialize YOLO Face Detector with fallback to InsightFaceDetector
+        yolo_weights = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "yolov8n-face.pt")
+        if not os.path.exists(yolo_weights):
+            yolo_weights = "yolov8n-face.pt"
+
+        if os.path.exists(yolo_weights):
+            from app.detection.detector import YOLOFaceDetector
+            self.detector = YOLOFaceDetector(weights_path=yolo_weights, insight_app=self.app)
+            print(f"Detector initialized: {self.detector.get_backend_name()}")
+        else:
+            self.detector = InsightFaceDetector(self.app)
+            print(f"Detector initialized: {self.detector.get_backend_name()}")
+
         self.embedder = ArcFaceEmbedder(model_name=f"{self.model_name}-arcface-512")
         self.is_ready = True
 

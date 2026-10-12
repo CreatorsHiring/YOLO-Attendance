@@ -11,7 +11,6 @@ export default function EnrollStudent() {
     section: 'A',
   });
 
-  const [consentGiven, setConsentGiven] = useState(true);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null); // { type: 'success' | 'error', text: '' }
@@ -28,10 +27,6 @@ export default function EnrollStudent() {
     capturePhotoBlob,
   } = useCamera();
 
-  useEffect(() => {
-    startCamera();
-    return () => stopCamera();
-  }, [startCamera, stopCamera]);
 
   const handleCapture = async () => {
     const photo = await capturePhotoBlob();
@@ -56,14 +51,6 @@ export default function EnrollStudent() {
 
     if (!capturedPhoto) {
       setStatusMessage({ type: 'error', text: 'Please capture a student face photo using the camera.' });
-      return;
-    }
-
-    if (!consentGiven) {
-      setStatusMessage({
-        type: 'error',
-        text: 'Biometric enrollment requires student/faculty consent before template storage.'
-      });
       return;
     }
 
@@ -149,8 +136,9 @@ export default function EnrollStudent() {
                   className="w-full h-full object-cover transform -scale-x-100"
                 />
                 {!isReady && !cameraError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 text-white text-xs">
-                    Initializing camera stream...
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-950/70 text-white text-xs p-4 text-center">
+                    <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <span className="text-gray-300">Starting camera...</span>
                   </div>
                 )}
                 {/* Face Alignment Overlay Guide */}
@@ -270,21 +258,6 @@ export default function EnrollStudent() {
                 className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-hidden"
               />
             </div>
-          </div>
-
-          {/* Biometric Privacy & Consent Notice */}
-          <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3.5">
-            <label className="flex items-start space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={consentGiven}
-                onChange={(e) => setConsentGiven(e.target.checked)}
-                className="mt-0.5 rounded-sm border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              <span className="text-xs text-emerald-950 leading-relaxed">
-                <strong>Biometric Consent:</strong> I verify student permission to capture face features. Facial features are converted to numerical ArcFace embeddings (512 dimensions) solely for university attendance matching.
-              </span>
-            </label>
           </div>
 
           {/* Feedback Messages */}
